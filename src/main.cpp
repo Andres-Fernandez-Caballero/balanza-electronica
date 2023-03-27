@@ -1,13 +1,23 @@
 #include <Arduino.h>
+#include <HT1621.h>
+#include "config.h"
+
+HT1621 displayWeigh;
+HT1621 displayPrice; 
+HT1621 displayTotalAmount;
+
+double weight = 1.50;
+double price = 2.00;
+
 
 void setup() {
-  // BLINKING LED
-  pinMode(LED_BUILTIN, OUTPUT);
+  displayWeigh.begin(2, 3, 4);
+  displayPrice.begin(5, 6, 7);
+  displayTotalAmount.begin(8, 9, 10);
 }
 
 void loop() {
-  digitalWrite(LED_BUILTIN, HIGH);   // turn the LED on (HIGH is the voltage level)
-  delay(1000);                       // wait for a second
-  digitalWrite(LED_BUILTIN, LOW);    // turn the LED off by making the voltage LOW
-  delay(1000);                       // wait for a second
+  displayWeigh.print(weight, PRECICION_DECIMALS);
+  displayPrice.print(price, PRECICION_DECIMALS);
+  displayTotalAmount.print(weight * price, PRECICION_DECIMALS);
 }

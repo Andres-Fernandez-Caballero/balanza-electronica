@@ -1,10 +1,13 @@
 #include <Arduino.h>
 #include <HT1621.h>
 #include "config.h"
+#include "Bipper.h"
 
 HT1621 displayWeigh;
 HT1621 displayPrice; 
 HT1621 displayTotalAmount;
+
+Bipper bipper(BIPPER_PIN);
 
 double weight = 1.50;
 double price = 2.00;
@@ -14,6 +17,7 @@ void setup() {
   displayWeigh.begin(2, 3, 4);
   displayPrice.begin(5, 6, 7);
   displayTotalAmount.begin(8, 9, 10);
+  bipper.beep();
 }
 
 void loop() {

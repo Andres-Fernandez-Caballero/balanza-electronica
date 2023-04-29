@@ -5,6 +5,7 @@
 #include "Bipper.h"
 #include "Keyboard.h"
 #include <Wire.h>
+#include "buttons.h"
 
 HT1621 displayWeigh;
 HT1621 displayPrice; 
@@ -16,32 +17,35 @@ Keyboard keyboard = Keyboard(ADDRESS_KEYBOARD);
 
 long read;
 float weight = 0.00 ;
-float price = 4.00;
+float price = 0.00;
+float priceDecimals = 0;
+int priceDecimalsCounter = 1;
 
+bool isDecimalsMode = false;
 
 void keypadEvent(KeypadEvent key){
-  switch(keyboard.getState()){
-    case PRESSED:
+  if(keyboard.getState() == PRESSED) {
       switch (key){
-       case 'A': 
-        price = 3.00; 
-        Serial.println("new Price: " + String(price));
+        case CLEAR: 
+          price *= 0; 
+          priceDecimals = 0;
+          priceDecimalsCounter = 1;
+          
+          Serial.println("new Price: " + String(price));
+          break;
+        case DOT:
+          isDecimalsMode = !isDecimalsMode;
+          Serial.println("isDecimalsMode: " + isDecimalsMode? "modo decimal" : "modo entero");
+      }
+    }else if (keyboard.getState() == RELEASED) {
+      switch (key){
+        // do logic
+      }
+    }else if (keyboard.getState() == HOLD) {
+      switch (key){
+        case DOT: // something more 
         break;
       }
-    break;
-    case RELEASED:
-      switch (key){
-        case '*': 
-          // do somting else
-        break;
-      }
-    break;
-    case HOLD:
-      switch (key){
-        case '*': // something more 
-        break;
-      }
-    break;
   }
 }
 
@@ -66,7 +70,17 @@ void setup() {
 void loop() {   
     char key = keyboard.getKey();
     if(key){
-      Serial.print(key);
+      if(keyIsNumber(key)){
+        if(isDecimalsMode){
+          priceDecimals = float(key - '0') / (priceDecimalsCounter *= 10);
+          Serial.println("decimals " + String(priceDecimals));
+          price = price + priceDecimals;
+        }else {
+          price = price * 10 + (key - '0');
+        }
+          Serial.println("new Price: " + String(price));
+      }
+
       bipper.beep();
     }else {
       read = scale.get_units(3);

@@ -7,3 +7,6 @@
 #define HX711_SCK 12
 #define HX711_DOUT 13
 #define HX711_SCALE 145.6964285714286
+
+// I2C address keyboard
+#define ADDRESS_KEYBOARD 0x20

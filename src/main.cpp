@@ -23,11 +23,10 @@ void keypadEvent(KeypadEvent key){
   switch(keyboard.getState()){
     case PRESSED:
       switch (key){
-        case '#':  bipper.beep();  bipper.beep(); break;
-        case '*': 
-          // do somthing
+       case 'A': 
+        price = 3.00; 
+        Serial.println("new Price: " + String(price));
         break;
-        case 'A': price = 3.00; break;
       }
     break;
     case RELEASED:
@@ -56,6 +55,7 @@ void setup() {
   
   Wire.begin();
   keyboard.begin();
+  keyboard.addEventListener(keypadEvent);
 
   scale.begin(HX711_DOUT, HX711_SCK);
   scale.set_scale(HX711_SCALE);
@@ -74,13 +74,5 @@ void loop() {
       displayWeigh.print(weight, PRECICION_DECIMALS);
       displayPrice.print(price, PRECICION_DECIMALS);
       displayTotalAmount.print(weight * price, PRECICION_DECIMALS);
-    }
-    
-    
-    //if (scale.wait_ready_timeout(100)) {
-
- // }
-  
-  
- 
+    } 
 }

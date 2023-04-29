@@ -7,15 +7,11 @@
 #include "Keypad_i2c.h"
 
 
-class Keyboard {
+class Keyboard: public Keypad_I2C {
     public:
         Keyboard(byte address);
-        void begin();
-        void addEventListener(void (*listener)(char));
-        char getKey();
-        KeyState getState();
+        
     private:
-        Keypad_I2C _keypad;
         const static byte ROWS = 4;
         const static byte COLS = 4;
         char keys[ROWS][COLS] = {

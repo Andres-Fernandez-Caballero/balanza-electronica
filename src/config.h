@@ -1,5 +1,4 @@
 #define BAUD_SPEED 9600
-#define MESSAGE "Hello World from configs!"
 #define PRECICION_DECIMALS 2
 
 // PINs
@@ -7,6 +6,22 @@
 #define HX711_SCK 12
 #define HX711_DOUT 13
 #define HX711_SCALE 145.6964285714286
+
+
+// DISPLAY TOTAL
+#define DISPLAY_TOTAL_CS 8
+#define DISPLAY_TOTAL_WR 9
+#define DISPLAY_TOTAL_DATA 10
+
+// DISPLAY PRICE
+#define DISPLAY_PRICE_CS 5
+#define DISPLAY_PRICE_WR 6
+#define DISPLAY_PRICE_DATA 7
+
+// DISPLAY WEIGHT
+#define DISPLAY_WEIGHT_CS 2
+#define DISPLAY_WEIGHT_WR 3
+#define DISPLAY_WEIGHT_DATA 4
 
 // I2C address keyboard
 #define ADDRESS_KEYBOARD 0x20

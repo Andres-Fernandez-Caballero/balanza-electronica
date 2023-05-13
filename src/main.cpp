@@ -6,6 +6,7 @@
 #include "Keyboard.h"
 #include <Wire.h>
 #include "buttons.h"
+#include "globals.h"
 
 HT1621 displayWeigh;
 HT1621 displayPrice; 
@@ -14,14 +15,6 @@ HT1621 displayTotalAmount;
 HX711 scale;
 Bipper bipper(BIPPER_PIN);
 Keyboard keyboard = Keyboard(ADDRESS_KEYBOARD);
-
-long read;
-float weight = 0.00 ;
-float price = 0.00;
-float priceDecimals = 0;
-int priceDecimalsCounter = 1;
-
-bool isDecimalsMode = false;
 
 void keypadEvent(KeypadEvent key){
   if(keyboard.getState() == PRESSED) {
@@ -53,9 +46,23 @@ void keypadEvent(KeypadEvent key){
 void setup() {
   Serial.begin(BAUD_SPEED);
 
-  displayWeigh.begin(2, 3, 4);
-  displayPrice.begin(5, 6, 7);
-  displayTotalAmount.begin(8, 9, 10);
+  displayWeigh.begin(
+    DISPLAY_WEIGHT_CS, 
+    DISPLAY_WEIGHT_WR, 
+    DISPLAY_WEIGHT_DATA
+  );
+
+  displayPrice.begin(
+    DISPLAY_PRICE_CS, 
+    DISPLAY_PRICE_WR, 
+    DISPLAY_PRICE_DATA
+    );
+
+  displayTotalAmount.begin(
+    DISPLAY_TOTAL_CS, 
+    DISPLAY_TOTAL_WR, 
+    DISPLAY_TOTAL_DATA
+    );
   
   Wire.begin();
   keyboard.begin();

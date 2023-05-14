@@ -7,6 +7,8 @@
 #include <Wire.h>
 #include "buttons.h"
 #include "globals.h"
+#include "History.h"
+
 
 HT1621 displayWeigh;
 HT1621 displayPrice; 
@@ -15,6 +17,7 @@ HT1621 displayTotalAmount;
 HX711 scale;
 Bipper bipper(BIPPER_PIN);
 Keyboard keyboard = Keyboard(ADDRESS_KEYBOARD);
+History history;
 
 void keypadEvent(KeypadEvent key){
   if(keyboard.getState() == PRESSED) {
@@ -23,8 +26,16 @@ void keypadEvent(KeypadEvent key){
           price *= 0; 
           priceDecimals = 0;
           priceDecimalsCounter = 1;
+
+          history.clear();
           
           Serial.println("new Price: " + String(price));
+          break;
+        case ADD:
+          history.add(price);
+          Serial.println("added to history: " + String(price));
+          bipper.beep();
+          
           break;
         case DOT:
           isDecimalsMode = !isDecimalsMode;
@@ -44,6 +55,7 @@ void keypadEvent(KeypadEvent key){
 
 
 void setup() {
+  history = History();
   Serial.begin(BAUD_SPEED);
 
   displayWeigh.begin(
@@ -74,7 +86,8 @@ void setup() {
   bipper.beep();
 }
 
-void loop() {   
+void loop() { 
+    Serial.println(history.calculateTotal());
     char key = keyboard.getKey();
     if(key){
       if(keyIsNumber(key)){

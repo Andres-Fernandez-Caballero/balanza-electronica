@@ -8,34 +8,59 @@
 #include "buttons.h"
 #include "globals.h"
 #include "History.h"
+#include "Display_number.h"
 
 
 HT1621 displayWeigh;
 HT1621 displayPrice; 
 HT1621 displayTotalAmount;
 
+DisplayNumber price;
+
 HX711 scale;
 Bipper bipper(BIPPER_PIN);
 Keyboard keyboard = Keyboard(ADDRESS_KEYBOARD);
 History history;
 
+void totalMode() {
+  displayTotalAmount.print(history.calculateTotal(), PRECICION_DECIMALS);
+  displayWeigh.noDisplay();
+  displayPrice.noDisplay();
+}
+
+void weightMode() {
+  read = scale.get_units(3);
+  weight = read / 1000.00;
+  displayWeigh.print(weight, PRECICION_DECIMALS);
+  displayPrice.print(price.getValue(), PRECICION_DECIMALS);
+  displayTotalAmount.print(weight * price.getValue(), PRECICION_DECIMALS);
+}
+
 void keypadEvent(KeypadEvent key){
   if(keyboard.getState() == PRESSED) {
       switch (key){
-        case CLEAR: 
-          price *= 0; 
-          priceDecimals = 0;
-          priceDecimalsCounter = 1;
-
-          history.clear();
-          
-          Serial.println("new Price: " + String(price));
+        case CLEAR:
+          isWeightMode = true; 
+          displayPrice.display();
+          displayWeigh.display();
+          displayTotalAmount.display();
+          price.clear();
+          history.clear();  
+          Serial.println("new Price: " + String(price.getValue()));
           break;
         case ADD:
-          history.add(price);
-          Serial.println("added to history: " + String(price));
+          history.add(weight * price.getValue());
+          Serial.println("added to history: " + String(price.getValue()));
           bipper.beep();
-          
+          price.clear();
+          break;
+        case GET_TOTAL:
+          if(isWeightMode) {
+            history.add(price.getValue());
+            isWeightMode = false;
+            Serial.println("total is " + String(history.calculateTotal()) );;
+            bipper.beep();
+          }
           break;
         case DOT:
           isDecimalsMode = !isDecimalsMode;
@@ -55,8 +80,9 @@ void keypadEvent(KeypadEvent key){
 
 
 void setup() {
-  history = History();
   Serial.begin(BAUD_SPEED);
+  history = History();
+  price = DisplayNumber();
 
   displayWeigh.begin(
     DISPLAY_WEIGHT_CS, 
@@ -87,26 +113,23 @@ void setup() {
 }
 
 void loop() { 
-    Serial.println(history.calculateTotal());
     char key = keyboard.getKey();
-    if(key){
+    if(key) {
       if(keyIsNumber(key)){
+        float keyNumberValue = key - '0';
         if(isDecimalsMode){
-          priceDecimals = float(key - '0') / (priceDecimalsCounter *= 10);
-          Serial.println("decimals " + String(priceDecimals));
-          price = price + priceDecimals;
+          price.addDecimal(keyNumberValue);
         }else {
-          price = price * 10 + (key - '0');
+          price.addDigit(keyNumberValue);
         }
-          Serial.println("new Price: " + String(price));
+          Serial.println("new Price: " + String(price.getValue()));
       }
-
       bipper.beep();
     }else {
-      read = scale.get_units(3);
-      weight = read / 1000.00;
-      displayWeigh.print(weight, PRECICION_DECIMALS);
-      displayPrice.print(price, PRECICION_DECIMALS);
-      displayTotalAmount.print(weight * price, PRECICION_DECIMALS);
+      if(isWeightMode) {
+        weightMode();     
+      }else {
+        totalMode();
+      }
     } 
 }

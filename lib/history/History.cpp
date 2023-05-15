@@ -26,8 +26,8 @@ float History::getLast() {
 
 float History::calculateTotal() {
     float total = 0.0;
-    for (int i = 0; i < this->howManyRecords(); i++) {
-        total += this->get(i);
+    for (int index = 0; index < this->howManyRecords(); index++) {
+        total += this->get(index);
     }
     return total;
 }
